@@ -34,6 +34,7 @@ class AuthController extends Controller
 
         // Login manual (TANPA Auth::attempt)
         Auth::guard('web')->login($user);
+
         $request->session()->regenerate();
 
         // Redirect berdasarkan peran

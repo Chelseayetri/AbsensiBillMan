@@ -17,7 +17,7 @@
             
             <div class="collapse navbar-collapse" id="navbarContent">
                 <ul class="navbar-nav ms-auto">
-                    @if(Auth::check() && Auth::user()->peran->nama_peran == 'Petugas')
+                  @if(Auth::check() && Auth::user()->peran->nama_peran == 'Petugas')
                         <li class="nav-item"><a class="nav-link" href="{{ route('petugas.dashboard') }}">Dashboard</a></li>
                         <li class="nav-item"><a class="nav-link" href="{{ route('petugas.absen') }}">Absen</a></li>
                         <li class="nav-item"><a class="nav-link" href="{{ route('petugas.riwayat') }}">Riwayat</a></li>
