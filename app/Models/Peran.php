@@ -9,9 +9,12 @@ class Peran extends Model
 {
     protected $table = 'peran';
     protected $primaryKey = 'id_peran';
+
     public $incrementing = false;
     protected $keyType = 'string';
     public $timestamps = false;
+
+    protected $fillable = ['nama_peran'];
 
     protected static function boot()
     {
@@ -24,7 +27,6 @@ class Peran extends Model
         });
     }
 
-    // Relasi: Peran punya banyak Pengguna
     public function pengguna()
     {
         return $this->hasMany(Pengguna::class, 'id_peran', 'id_peran');
