@@ -6,11 +6,26 @@
 <div class="card">
     <h2>Form Absensi</h2>
 
+    {{-- pesan error --}}
     @if(session('error'))
         <p style="color:red">{{ session('error') }}</p>
     @endif
 
-    <form method="POST" action="{{ route('petugas.absen.store') }}" enctype="multipart/form-data">
+    {{-- pesan validasi --}}
+    @if ($errors->any())
+        <ul style="color:red">
+            @foreach ($errors->all() as $error)
+                <li>{{ $error }}</li>
+            @endforeach
+        </ul>
+    @endif
+
+    {{-- FORM YANG BENAR --}}
+    <form 
+        action="{{ route('petugas.absen.store') }}" 
+        method="POST" 
+        enctype="multipart/form-data"
+    >
         @csrf
 
         <label>Jumlah Kegiatan</label><br>
@@ -28,7 +43,9 @@
         <label>Bukti Foto</label><br>
         <input type="file" name="bukti_foto" accept="image/*"><br><br>
 
-        <button type="submit" class="btn">Simpan Absensi</button>
+        <button type="submit" class="btn">
+            Simpan Absensi
+        </button>
     </form>
 </div>
 @endsection

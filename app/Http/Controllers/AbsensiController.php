@@ -22,7 +22,7 @@ class AbsensiController extends Controller
 
     private function idPengguna()
     {
-        return 1; // dummy user
+        return 'dbe771ba-2ed6-4756-ba98-d19460e72ef9'; // dummy user
     }
 
     // ================= PETUGAS =================
@@ -33,45 +33,38 @@ class AbsensiController extends Controller
         return view('petugas.absen');
     }
 
-    public function simpanAbsen(Request $request)
-    {
-        $idPengguna = $this->idPengguna();
+public function simpanAbsen(Request $request)
+{
+    $idPengguna = $this->idPengguna();
 
-        // Cegah absen 2x sehari
-        $cek = Absensi::where('id_pengguna', $idPengguna)
-            ->whereDate('tanggal', now()->toDateString())
-            ->first();
+    $cek = Absensi::where('id_pengguna', $idPengguna)
+        ->whereDate('tanggal', now()->toDateString())
+        ->first();
 
-        if ($cek) {
-            return redirect()->route('petugas.riwayat')
-                ->with('error', 'Absensi hari ini sudah tercatat.');
-        }
-
-        $request->validate([
-            'jumlah_kegiatan' => 'required|integer|min:0',
-            'status' => 'required|in:hadir,izin,sakit,cuti',
-            'bukti_foto' => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
-        ]);
-
-        $path = null;
-        if ($request->hasFile('bukti_foto')) {
-            $path = $request->file('bukti_foto')
-                ->store('bukti_absensi', 'public');
-        }
-
-        Absensi::create([
-            'id_pengguna'     => $idPengguna,
-            'jumlah_kegiatan' => $request->jumlah_kegiatan,
-            'bukti_foto'      => $path,
-            'status'          => $request->status,
-            'tanggal'         => now()->toDateString(),
-            'waktu'           => now()->toTimeString(),
-            'dibuat_pada'     => now(),
-        ]);
-
+    if ($cek) {
         return redirect()->route('petugas.riwayat')
-            ->with('success', 'Absensi berhasil disimpan.');
+            ->with('error', 'Absensi hari ini sudah tercatat.');
     }
+
+    $request->validate([
+        'jumlah_kegiatan' => 'required|integer|min:0',
+        'status' => 'required|in:hadir,izin,sakit,cuti',
+        'bukti_foto' => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
+    ]);
+
+    Absensi::create([
+        'id_pengguna'     => $idPengguna,
+        'jumlah_kegiatan' => $request->jumlah_kegiatan,
+        'bukti_foto'      => null,
+        'status'          => $request->status,
+        'tanggal'         => now()->toDateString(),
+        'waktu'           => now()->toTimeString(),
+        'dibuat_pada'     => now(),
+    ]);
+
+    return redirect()->route('petugas.riwayat')
+        ->with('success', 'Absensi berhasil disimpan.');
+}
 
     public function riwayatPetugas()
     {
