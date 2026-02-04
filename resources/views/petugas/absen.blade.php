@@ -36,8 +36,7 @@
     @else
         <form 
             action="{{ route('petugas.absen.store') }}" 
-            method="POST" 
-            enctype="multipart/form-data"
+            method="POST"
         >
             @csrf
 
@@ -58,13 +57,25 @@
                 <option value="cuti"  {{ old('status') == 'cuti'  ? 'selected' : '' }}>Cuti</option>
             </select><br><br>
 
-            <label>Bukti Foto</label><br>
+            {{-- === BAGIAN YANG DIUBAH (KAMERA LANGSUNG) === --}}
+            <label>Bukti Foto (Ambil Langsung)</label><br>
+
+            <video id="video" width="320" height="240" autoplay></video><br><br>
+
+            <button type="button" onclick="ambilFoto()">
+                Ambil Foto
+            </button>
+
+            <canvas id="canvas" style="display:none;"></canvas>
+
             <input 
-                type="file" 
-                name="bukti_foto" 
-                accept="image/*"
+                type="hidden" 
+                name="bukti_foto_base64" 
+                id="bukti_foto_base64"
                 required
-            ><br><br>
+            >
+
+            <br><br>
 
             <button type="submit" class="btn">
                 Simpan Absensi
@@ -72,4 +83,30 @@
         </form>
     @endif
 </div>
+
+{{-- SCRIPT KAMERA --}}
+<script>
+navigator.mediaDevices.getUserMedia({ video: true })
+    .then(stream => {
+        document.getElementById('video').srcObject = stream;
+    })
+    .catch(() => {
+        alert('Kamera tidak dapat diakses. Pastikan izin kamera diberikan.');
+    });
+
+function ambilFoto() {
+    const canvas = document.getElementById('canvas');
+    const video = document.getElementById('video');
+
+    canvas.width = video.videoWidth;
+    canvas.height = video.videoHeight;
+
+    canvas.getContext('2d').drawImage(video, 0, 0);
+
+    document.getElementById('bukti_foto_base64').value =
+        canvas.toDataURL('image/jpeg');
+
+    alert('Foto berhasil diambil');
+}
+</script>
 @endsection
