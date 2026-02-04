@@ -29,8 +29,13 @@ class AbsensiController extends Controller
 
     public function formAbsen()
     {
-        // LANGSUNG TAMPILKAN FORM
-        return view('petugas.absen');
+      $idPengguna = $this->idPengguna();
+
+    $sudahAbsen = Absensi::where('id_pengguna', $idPengguna)
+        ->whereDate('tanggal', now()->toDateString())
+        ->exists();
+
+    return view('petugas.absen', compact('sudahAbsen'));
     }
 
 public function simpanAbsen(Request $request)

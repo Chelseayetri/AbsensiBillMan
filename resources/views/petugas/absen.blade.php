@@ -6,6 +6,11 @@
 <div class="card">
     <h2>Form Absensi</h2>
 
+    {{-- pesan sukses --}}
+    @if(session('success'))
+        <p style="color:green">{{ session('success') }}</p>
+    @endif
+
     {{-- pesan error --}}
     @if(session('error'))
         <p style="color:red">{{ session('error') }}</p>
@@ -20,32 +25,51 @@
         </ul>
     @endif
 
-    {{-- FORM YANG BENAR --}}
-    <form 
-        action="{{ route('petugas.absen.store') }}" 
-        method="POST" 
-        enctype="multipart/form-data"
-    >
-        @csrf
+    {{-- JIKA SUDAH ABSEN --}}
+    @if(isset($sudahAbsen) && $sudahAbsen)
+        <div style="background:#fff3cd; color:#856404; padding:15px; border-radius:5px;">
+            <strong>Perhatian!</strong><br>
+            Anda sudah melakukan absensi hari ini.
+        </div>
 
-        <label>Jumlah Kegiatan</label><br>
-        <input type="number" name="jumlah_kegiatan" required><br><br>
+    {{-- JIKA BELUM ABSEN --}}
+    @else
+        <form 
+            action="{{ route('petugas.absen.store') }}" 
+            method="POST" 
+            enctype="multipart/form-data"
+        >
+            @csrf
 
-        <label>Status</label><br>
-        <select name="status" required>
-            <option value="">-- Pilih --</option>
-            <option value="hadir">hadir</option>
-            <option value="izin">izin</option>
-            <option value="sakit">sakit</option>
-            <option value="cuti">cuti</option>
-        </select><br><br>
+            <label>Jumlah Kegiatan</label><br>
+            <input 
+                type="number" 
+                name="jumlah_kegiatan" 
+                value="{{ old('jumlah_kegiatan') }}"
+                required
+            ><br><br>
 
-        <label>Bukti Foto</label><br>
-        <input type="file" name="bukti_foto" accept="image/*"><br><br>
+            <label>Status</label><br>
+            <select name="status" required>
+                <option value="">-- Pilih --</option>
+                <option value="hadir" {{ old('status') == 'hadir' ? 'selected' : '' }}>Hadir</option>
+                <option value="izin"  {{ old('status') == 'izin'  ? 'selected' : '' }}>Izin</option>
+                <option value="sakit" {{ old('status') == 'sakit' ? 'selected' : '' }}>Sakit</option>
+                <option value="cuti"  {{ old('status') == 'cuti'  ? 'selected' : '' }}>Cuti</option>
+            </select><br><br>
 
-        <button type="submit" class="btn">
-            Simpan Absensi
-        </button>
-    </form>
+            <label>Bukti Foto</label><br>
+            <input 
+                type="file" 
+                name="bukti_foto" 
+                accept="image/*"
+                required
+            ><br><br>
+
+            <button type="submit" class="btn">
+                Simpan Absensi
+            </button>
+        </form>
+    @endif
 </div>
 @endsection
