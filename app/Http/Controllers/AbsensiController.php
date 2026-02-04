@@ -37,6 +37,7 @@ public function simpanAbsen(Request $request)
 {
     $idPengguna = $this->idPengguna();
 
+    // Cegah absen 2x sehari
     $cek = Absensi::where('id_pengguna', $idPengguna)
         ->whereDate('tanggal', now()->toDateString())
         ->first();
@@ -49,14 +50,17 @@ public function simpanAbsen(Request $request)
     $request->validate([
         'jumlah_kegiatan' => 'required|integer|min:0',
         'status' => 'required|in:hadir,izin,sakit,cuti',
-        'bukti_foto' => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
+        'bukti_foto' => 'required|image|mimes:jpg,jpeg,png|max:2048',
     ]);
+
+    $path = $request->file('bukti_foto')
+        ->store('bukti_absensi', 'public');
 
     Absensi::create([
         'id_pengguna'     => $idPengguna,
         'jumlah_kegiatan' => $request->jumlah_kegiatan,
-        'bukti_foto'      => null,
-        'status'          => $request->status,
+        'bukti_foto'      => $path,
+        'status'          => strtolower($request->status),
         'tanggal'         => now()->toDateString(),
         'waktu'           => now()->toTimeString(),
         'dibuat_pada'     => now(),
@@ -65,6 +69,7 @@ public function simpanAbsen(Request $request)
     return redirect()->route('petugas.riwayat')
         ->with('success', 'Absensi berhasil disimpan.');
 }
+
 
     public function riwayatPetugas()
     {
